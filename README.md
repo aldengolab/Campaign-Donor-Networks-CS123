@@ -1,5 +1,5 @@
 # Campaign-Donor-Networks-CS123
-## *Alden Golab, Paul Mack*
+*Alden Golab, Paul Mack*
 
 Class Project for CS 123: Measuring US Campaign Donor Networks.
 
