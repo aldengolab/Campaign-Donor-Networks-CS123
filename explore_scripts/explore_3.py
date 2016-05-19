@@ -14,8 +14,9 @@ class donor_pairs(MRJob):
         '''
         try:
             # Use reader to account for commas within quotation marks
-            rdr = csv.reader([line])
-            columns = rdr.next()
+            # rdr = csv.reader([line])
+            # columns = rdr.next()
+            columns = line.split(',')
             if columns[0] != 'id' and int(columns[2]) >= YEAR_START and\
              int(columns[2]) <= YEAR_END:
                 contributor_name = columns[10]
@@ -23,7 +24,7 @@ class donor_pairs(MRJob):
                 if contributor_name != '':
                     yield contributor_name, recipient_id
         except IndexError as e:
-            print(e)
+            yield '', ''
 
     def combiner(self, contributor_name, recipient_id):
         '''
