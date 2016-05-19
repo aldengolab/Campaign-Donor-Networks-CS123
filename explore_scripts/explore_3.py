@@ -1,12 +1,10 @@
-'''
-3. Pull all donor/election pairs
-'''
+#!/usr/bin/env python
 
 from mrjob.job import MRJob
 import csv
 
 YEAR_START = 1998
-YEAR_END = 2001
+YEAR_END = 2014
 
 class donor_pairs(MRJob):
 
@@ -14,14 +12,18 @@ class donor_pairs(MRJob):
         '''
         Grabs contributor and recipient from line.
         '''
-        # Use reader to account for commas within quotation marks
-        rdr = csv.reader([line])
-        columns = rdr.next()
-        if columns[0] != 'id' and int(columns[2]) >= YEAR_START and\
-         int(columns[2]) <= YEAR_END:
-            contributor_name = columns[10]
-            recipient_id = columns[25]
-            yield contributor_name, recipient_id
+        try:
+            # Use reader to account for commas within quotation marks
+            rdr = csv.reader([line])
+            columns = rdr.next()
+            if columns[0] != 'id' and int(columns[2]) >= YEAR_START and\
+             int(columns[2]) <= YEAR_END:
+                contributor_name = columns[10]
+                recipient_id = columns[25]
+                if contributor_name != '':
+                    yield contributor_name, recipient_id
+        except IndexError as e:
+            print(e)
 
     def combiner(self, contributor_name, recipient_id):
         '''
