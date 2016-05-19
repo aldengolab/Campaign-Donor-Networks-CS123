@@ -3,9 +3,6 @@
 from mrjob.job import MRJob
 import csv
 
-YEAR_START = 1998
-YEAR_END = 2014
-
 class donor_pairs(MRJob):
 
     def mapper(self, _, line):
@@ -14,11 +11,11 @@ class donor_pairs(MRJob):
         '''
         try:
             # Use reader to account for commas within quotation marks
+            # This code is broken, not sure why
             # rdr = csv.reader([line])
             # columns = rdr.next()
             columns = line.split(',')
-            if columns[0] != 'id' and int(columns[2]) >= YEAR_START and\
-             int(columns[2]) <= YEAR_END:
+            if columns[0] != 'id':
                 contributor_name = columns[10]
                 recipient_id = columns[25]
                 if contributor_name != '':
