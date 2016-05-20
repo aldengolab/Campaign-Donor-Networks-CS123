@@ -3,8 +3,10 @@
 from mrjob.job import MRJob
 import csv
 
-class donor_pairs(MRJob):
-
+class Donor_Pairs(MRJob):
+    '''
+    Lists all donor pairs from file.
+    '''
     def mapper(self, _, line):
         '''
         Grabs contributor and recipient from line.
@@ -12,9 +14,11 @@ class donor_pairs(MRJob):
         try:
             # Use reader to account for commas within quotation marks
             # This code is broken, not sure why
-            # rdr = csv.reader([line])
-            # columns = rdr.next()
-            columns = line.split(',')
+            rdr = csv.reader([line])
+            columns = rdr.next()
+            for i in range(len(columns)):
+                columns[i] = columns[i].strip("'\"\/").lower()
+            # columns = line.split(',')
             if columns[0] != 'id':
                 contributor_name = columns[10]
                 recipient_id = columns[25]
@@ -44,4 +48,4 @@ class donor_pairs(MRJob):
             yield contributor_name, r
 
 if __name__ == '__main__':
-    donor_pairs.run()
+    Donor_Pairs.run()
