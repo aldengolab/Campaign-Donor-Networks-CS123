@@ -5,6 +5,7 @@
 # company aliases to their Fortune 500 authoritative name for further analyis.
 
 from mrjob.job import MRJob
+from mrjob.protocol import JSONValueProtocol
 import csv
 from fuzzywuzzy import fuzzy
 
@@ -25,6 +26,8 @@ class fortune_json_builder(MRJob):
     Creates a JSON file mapping Fortune 500 company names to their aliases
     within the dataset. 
     '''
+    OUTPUT_PROTOCOL = mrjob.protocol.JSONValueProtocol
+    
     def fields(self, line):
         '''
         Reads and strips line.
@@ -81,17 +84,22 @@ class fortune_json_builder(MRJob):
     
     def combiner(self, company, alias):
         '''
-        Reduces extra company/alias pairs.
+        Combines extra company/alias pairs at each node.
         '''
         yield company, alias
         
     def reducer(self, company, alias):
         '''
+        Yields a pretty json 
         '''
-        rv[company] = []
+        rv = {}
+        rv[company] = {'aliases':[]}
         for name in alias: 
-            rv[company].append(name)
+            rv[company][aliases].append(name)
+        yield None, json.dumps(rv, sort_keys=True, indent=4)
         
+if __name__ == '__main__':
+    fortune_json_builder.run()
         
         
         
