@@ -58,13 +58,16 @@ class total_donations(MRJob):
 
     def reducer(self, donor, amount):
         ''' replaces min val of the heap if the amount number is greater than the min value '''
-        if donor[0] == 'c':
-            donor = str(donor[1])
-            amount = sum(amount)
-            replacement = (amount, donor)
-            if replacement > min(self.h):
-                if donor:
-                    heapq.heapreplace(self.h,replacement)
+        try:
+            if donor[0] == 'c':
+                donor = str(donor[1])
+                amount = sum(amount)
+                replacement = (amount, donor)
+                if replacement > min(self.h):
+                    if donor:
+                        heapq.heapreplace(self.h,replacement)
+        except Exception as e:
+            print e
 
 
 
