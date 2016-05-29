@@ -1,0 +1,3 @@
+pip install fuzzywuzzy
+pip install python-Levenshtein
+pip install mrjob
