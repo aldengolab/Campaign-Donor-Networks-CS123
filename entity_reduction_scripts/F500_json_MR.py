@@ -26,7 +26,7 @@ class fortune_json_builder(MRJob):
     Creates a JSON file mapping Fortune 500 company names to their aliases
     within the dataset. 
     '''
-    OUTPUT_PROTOCOL = mrjob.protocol.JSONValueProtocol
+    OUTPUT_PROTOCOL = JSONValueProtocol
     
     def fields(self, line):
         '''
@@ -49,6 +49,7 @@ class fortune_json_builder(MRJob):
         '''
         Performs an analysis to determine the similarity of two strings.
         '''
+        
         pass
     
     def configure_options(self):
@@ -96,7 +97,7 @@ class fortune_json_builder(MRJob):
         rv[company] = {'aliases':[]}
         for name in alias: 
             rv[company][aliases].append(name)
-        yield None, json.dumps(rv, sort_keys=True, indent=4)
+        yield None, json.dump(rv, sort_keys=True, indent=4)
         
 if __name__ == '__main__':
     fortune_json_builder.run()
