@@ -7,7 +7,7 @@
 from mrjob.job import MRJob
 from mrjob.protocol import JSONValueProtocol
 import csv
-from fuzzywuzzy import fuzzy
+from fuzzywuzzy import fuzz
 
 # Determines the threshold at which two strings are considered similiar
 SIMILARITY_THRESHOLD = 0.6
@@ -49,7 +49,6 @@ class fortune_json_builder(MRJob):
         '''
         Performs an analysis to determine the similarity of two strings.
         '''
-        
         pass
     
     def configure_options(self):
@@ -91,12 +90,11 @@ class fortune_json_builder(MRJob):
         
     def reducer(self, company, alias):
         '''
-        Yields a pretty json 
+        Yields a pretty json. 
         '''
         rv = {}
-        rv[company] = {'aliases':[]}
         for name in alias: 
-            rv[company][aliases].append(name)
+            rv[name] = company
         yield None, json.dump(rv, sort_keys=True, indent=4)
         
 if __name__ == '__main__':
