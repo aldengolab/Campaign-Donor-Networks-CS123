@@ -49,7 +49,7 @@ class fortune_json_builder(MRJob):
         '''
         Performs an analysis to determine the similarity of two strings.
         '''
-        pass
+        return max[fuzz.ratio(string1, string2), fuzz.token_set_ratio(string1, string2), fuzz.token_sort_ratio(string1, string2), fuzz.partial_ratio(string1, string2)]
     
     def configure_options(self):
         '''
