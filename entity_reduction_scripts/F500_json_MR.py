@@ -11,7 +11,7 @@ from fuzzywuzzy import fuzz
 import json
 
 # Determines the threshold at which two strings are considered similiar
-SIMILARITY_THRESHOLD = 60
+SIMILARITY_THRESHOLD = 70
 
 # Column indices for slicing
 ID = 0
@@ -56,7 +56,7 @@ class fortune_json_builder(MRJob):
         '''
         Makes csv containing Fortune 500 companies available to mapper.
         
-        Use: Add --add-file='FILE-PATH' as an option when running MRJob.
+        Use: Add --ancillary='FILE-PATH' as an option when running MRJob.
         '''
         super(fortune_json_builder, self).configure_options()
         self.add_file_option('--ancillary')
@@ -82,15 +82,25 @@ class fortune_json_builder(MRJob):
             f500_score = self.similarity_score(c, organization)
             if f500_score > SIMILARITY_THRESHOLD: 
                 yield c, organization
+                
+    def reducer_init(self):
+        '''
+        Initializes return value.
+        '''
+        self.rv = {}
     
     def reducer(self, company, alias):
         '''
-        Yields a pretty json. 
+        Adds each {Instance: AUTHNAME} to return value.
         '''
-        rv = {}
         for name in alias: 
-            rv[name] = company
-        yield None, rv
+            self.rv[name] = company
+        
+    def reducer_final(self):
+        '''
+        Yields final JSON.
+        '''
+        yield None, self.rv
         
 if __name__ == '__main__':
     fortune_json_builder.run()
