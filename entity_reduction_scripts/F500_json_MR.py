@@ -38,12 +38,13 @@ class fortune_json_builder(MRJob):
             rdr = csv.reader([line])
             columns = rdr.next()
             for i in range(len(columns)):
-                columns[i] = columns[i].strip("'\"\/\\").upper()
+                columns[i] = columns[i].strip("'\"\/").upper()
             if columns[0] != 'id':
                 organization = columns[ORGANIZATION]
             else:
                 organization = None
-        except: 
+        except Exception as e: 
+            print e
             organization = None
         
         return organization
