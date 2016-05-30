@@ -11,7 +11,7 @@ from fuzzywuzzy import fuzz
 import json
 
 # Determines the threshold at which two strings are considered similiar
-SIMILARITY_THRESHOLD = 0.6
+SIMILARITY_THRESHOLD = 60
 
 # Column indices for slicing
 ID = 0
@@ -90,7 +90,7 @@ class fortune_json_builder(MRJob):
         rv = {}
         for name in alias: 
             rv[name] = company
-        yield None, json.dumps(rv, sort_keys=True, indent=4)
+        yield None, rv
         
 if __name__ == '__main__':
     fortune_json_builder.run()
