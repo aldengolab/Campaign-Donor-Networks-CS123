@@ -17,10 +17,14 @@ SIMILARITY_THRESHOLD = 70
 ID = 0
 AMOUNT = 8
 CONTRIBUTOR_NAME = 10
+CONTRIBUTOR_EMPLOYER = 14
+RECIPIENT_NAME = 25
 SEAT = 36
 K = 50
 DONOR_TYPE = 12
 ORGANIZATION = 21
+PARENT_ORGANIZATION = 23
+
 
 class fortune_json_builder(MRJob):
     '''
@@ -49,6 +53,7 @@ class fortune_json_builder(MRJob):
                 parent = None
                 recipient = None
                 employer = None
+                
         except: 
             organization = None
             parent = None
@@ -97,24 +102,14 @@ class fortune_json_builder(MRJob):
                     if f500_score > SIMILARITY_THRESHOLD: 
                         yield c, n
                 
-    def reducer_init(self):
-        '''
-        Initializes return value.
-        '''
-        self.rv = {}
-    
     def reducer(self, company, alias):
         '''
         Adds each {Instance: AUTHNAME} to return value.
         '''
+        rv = {}
         for name in alias: 
-            self.rv[name] = company
-        
-    def reducer_final(self):
-        '''
-        Yields final JSON.
-        '''
-        yield None, self.rv
+            rv[name] = company
+        yield None, rv
         
 if __name__ == '__main__':
     fortune_json_builder.run()
