@@ -60,7 +60,7 @@ class fortune_json_builder(MRJob):
             recipient = None
             employer = None
         
-        return organization
+        return organization, parent, recipient, employer
     
     def similarity_score(self, string1, string2):
         '''
