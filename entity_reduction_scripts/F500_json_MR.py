@@ -39,10 +39,10 @@ class fortune_json_builder(MRJob):
             columns = rdr.next()
             for i in range(len(columns)):
                 columns[i] = columns[i].strip("'\"\/\\").upper()
-                if columns[0] != 'id':
-                    organization = columns[ORGANIZATION]
-                else:
-                    organization = None
+            if columns[0] != 'id':
+                organization = columns[ORGANIZATION]
+            else:
+                organization = None
         except: 
             organization = None
         
