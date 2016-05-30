@@ -8,6 +8,7 @@ from mrjob.job import MRJob
 from mrjob.protocol import JSONValueProtocol
 import csv
 from fuzzywuzzy import fuzz
+import json
 
 # Determines the threshold at which two strings are considered similiar
 SIMILARITY_THRESHOLD = 0.6
@@ -49,7 +50,7 @@ class fortune_json_builder(MRJob):
         '''
         Performs an analysis to determine the similarity of two strings.
         '''
-        return max[fuzz.ratio(string1, string2), fuzz.token_set_ratio(string1, string2), fuzz.token_sort_ratio(string1, string2), fuzz.partial_ratio(string1, string2)]
+        return fuzz.token_set_ratio(string1, string2)
     
     def configure_options(self):
         '''
@@ -58,18 +59,18 @@ class fortune_json_builder(MRJob):
         Use: Add --add-file='FILE-PATH' as an option when running MRJob.
         '''
         super(fortune_json_builder, self).configure_options()
-        self.add_file_option('--add-file')
+        self.add_file_option('--ancillary')
     
     def mapper_init(self):
         '''
         Gets Fortune 500 list to use for filtering/entity resolution.
         '''
-        companies = []
-        with open('self.options.add-file', 'rU') as f:
+        self.companies = []
+        with open(self.options.ancillary, 'rU') as f:
             reader = csv.reader(f, dialect=csv.excel_tab)
             for row in reader: 
                 if len(row) > 0: 
-                    companies.append(row[0])
+                    self.companies.append(row[0])
     
     def mapper(self, _, line):
         '''
@@ -77,17 +78,11 @@ class fortune_json_builder(MRJob):
         companies within the companies dictionary using a similarity metric.
         '''
         organization = self.fields(line)
-        for c in companies: 
-            f500_score = self.similarity(c, organization)
+        for c in self.companies: 
+            f500_score = self.similarity_score(c, organization)
             if f500_score > SIMILARITY_THRESHOLD: 
                 yield c, organization
     
-    def combiner(self, company, alias):
-        '''
-        Combines extra company/alias pairs at each node.
-        '''
-        yield company, alias
-        
     def reducer(self, company, alias):
         '''
         Yields a pretty json. 
@@ -95,7 +90,7 @@ class fortune_json_builder(MRJob):
         rv = {}
         for name in alias: 
             rv[name] = company
-        yield None, json.dump(rv, sort_keys=True, indent=4)
+        yield None, json.dumps(rv, sort_keys=True, indent=4)
         
 if __name__ == '__main__':
     fortune_json_builder.run()
