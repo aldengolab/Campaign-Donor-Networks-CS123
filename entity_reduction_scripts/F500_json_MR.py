@@ -12,7 +12,7 @@ import json
 import re
 
 # Determines the threshold at which two strings are considered similiar
-SIMILARITY_THRESHOLD = 70
+SIMILARITY_THRESHOLD = 80
 
 # Column indices for slicing
 ID = 0
