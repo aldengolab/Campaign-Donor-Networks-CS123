@@ -9,6 +9,7 @@ from mrjob.protocol import JSONValueProtocol
 import csv
 from fuzzywuzzy import fuzz
 import json
+import re
 
 # Determines the threshold at which two strings are considered similiar
 SIMILARITY_THRESHOLD = 70
@@ -64,7 +65,14 @@ class fortune_json_builder(MRJob):
         '''
         Performs an analysis to determine the similarity of two strings.
         '''
-        return fuzz.token_set_ratio(string1, string2)
+        stopwords = [ 'communication', 'communications' ,'inc', 'incorporated', 'company', 'corporation', 'co', 'enterprise', 'enterprises','group', 'industries', 'corp', 'llc', 'llp', 'international' ]
+        string1 = re.sub('[^a-zA-Z\d\s]','',string1).lower()
+        string2 = re.sub('[^a-zA-Z\d\s]','',string2).lower()
+        string1 = [word for word in string1.split() if word not in stopwords]
+        string2 = [word for word in string2.split() if word not in stopwords]
+        string1 = "".join(string1)
+        string2 = "".join(string2)
+        return fuzz.ratio(string1, string2)
     
     def configure_options(self):
         '''
