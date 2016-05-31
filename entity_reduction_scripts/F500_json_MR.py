@@ -12,7 +12,7 @@ import json
 import re
 
 # Determines the threshold at which two strings are considered similiar
-SIMILARITY_THRESHOLD = 80
+SIMILARITY_THRESHOLD = 85
 
 # Column indices for slicing
 ID = 0
@@ -65,7 +65,10 @@ class fortune_json_builder(MRJob):
         '''
         Performs an analysis to determine the similarity of two strings.
         '''
-        stopwords = [ 'communication', 'communications' ,'inc', 'incorporated', 'company', 'corporation', 'co', 'enterprise', 'enterprises','group', 'industries', 'corp', 'llc', 'llp', 'international' ]
+        stopwords = [ 'a', 'in', 'for', 'and', 'the', 'as', 'at', 'by', 'from', 'into', 'to', 'of', 'on', 'off', 'our', 'that', \
+        'so', 'own', 'out', 'communication', 'communications' ,'inc', 'incorporated', 'company', 'corporation', 'co', \
+         'enterprise', 'enterprises','group', 'industries', 'corp', 'llc', 'llp', 'international', 'product', 'products'   \
+         'technologies', 'technology', 'holdings', 'holding', 'global', 'financial', 'service', 'services', 'resource', 'resources']
         string1 = re.sub('[^a-zA-Z\d\s]','',string1).lower()
         string2 = re.sub('[^a-zA-Z\d\s]','',string2).lower()
         string1 = [word for word in string1.split() if word not in stopwords]
@@ -106,6 +109,7 @@ class fortune_json_builder(MRJob):
                 for n in names:
                     f500_score = self.similarity_score(c, n)
                     if f500_score > SIMILARITY_THRESHOLD: 
+                        print c, "matches:", n, "with score", f500_score
                         yield c, n
                 
     def reducer_init(self):
