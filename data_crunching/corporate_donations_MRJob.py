@@ -8,8 +8,10 @@
 from mrjob.job import MRJob
 from mrjob.protocol import ReprValueProtocol
 import csv
+from fuzzywuzzy import fuzz
 import json
 import re
+import os
 
 # Column indices for slicing
 ID = 0
@@ -80,7 +82,8 @@ class build_corporate_donations(MRJob):
                 date = columns[DATE]
                 amount = columns[AMOUNT]
                 seat = columns[SEAT]
-                result = columns[RESULT]
+                result = columns[RESULT].replace("\\", "")
+                result = result.replace("'", "")
             else:
                 donor_name = None
                 organization = None
@@ -92,13 +95,14 @@ class build_corporate_donations(MRJob):
                 seat = None
                 result = None
             if organization.lower() != parent.lower() and parent in \
-             entity_dictionary:
-                organization = entity_dictionary.get(parent)
-            elif organization in entity_dictionary: 
-                organization = entity_dictionary.get(organization)
-            recipient = entity_dictionary.get(recipient, None)
+             self.entity_dictionary:
+                organization = self.entity_dictionary.get(parent)
+            elif organization in self.entity_dictionary: 
+                organization = self.entity_dictionary.get(organization)
+            recipient = self.entity_dictionary.get(recipient, None)
             
-        except: 
+        except Exception as e: 
+            print e
             donor_name = None
             organization = None
             recipient = None
@@ -115,19 +119,24 @@ class build_corporate_donations(MRJob):
         Holds entity dictionary in memory for authoritative name lookup.
         '''
         with open(self.options.ancillary, 'rU') as f:
-            entity_dictionary = json.load(f)
+            self.entity_dictionary = json.load(f)
     
     def mapper(self, _, line):
         '''
         Reads line and concats strings. 
         '''
+        try: 
+            line.decode('ascii')
+        except: 
+            pass  
+        
         organization, recipient, party, date, amount, seat, result, donor_name = self.fields(line)
-         
-        if similarity_score(donor_name, organization) > 90:
+        
+        if organization != None and self.similarity_score(donor_name, organization) > 90:
             year = date.split('-')[0]
             month = date.split('-')[1]
-            key = ','.join([organization, recipient, party, seat, result, 
-            month, year])
+            print [organization, recipient, party, seat, result, month, year]
+            key = ','.join([organization, recipient, party, seat, result, month, year])
         
             yield key, amount
         
