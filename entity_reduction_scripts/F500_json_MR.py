@@ -115,7 +115,6 @@ class fortune_json_builder(MRJob):
                     if f500_score > SIMILARITY_THRESHOLD:
                         c = filter(lambda x: x in string.letters, c) 
                         n = filter(lambda x: x in string.letters, c)
-                        print c, "matches:", n, "with score", f500_score
                         yield c, n
                 
     def reducer_init(self):
