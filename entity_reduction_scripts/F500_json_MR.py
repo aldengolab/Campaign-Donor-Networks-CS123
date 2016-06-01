@@ -108,7 +108,9 @@ class fortune_json_builder(MRJob):
             for c in self.companies: 
                 for n in names:
                     f500_score = self.similarity_score(c, n)
-                    if f500_score > SIMILARITY_THRESHOLD: 
+                    if f500_score > SIMILARITY_THRESHOLD:
+                        c = filter(lambda x: x in string.letters, c) 
+                        n = filter(lambda x: x in string.letters, c)
                         print c, "matches:", n, "with score", f500_score
                         yield c, n
                 
