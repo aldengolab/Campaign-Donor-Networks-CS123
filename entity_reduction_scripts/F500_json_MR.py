@@ -102,6 +102,10 @@ class fortune_json_builder(MRJob):
         For each line in file, checks if organization name matches any of the
         companies within the companies dictionary using a similarity metric.
         '''
+        try: 
+            line.decode('ascii')
+        except: 
+            pass    
         organization, parent, recipient, employer = self.fields(line)
         names = [organization, parent, recipient, employer]
         if organization != None:
