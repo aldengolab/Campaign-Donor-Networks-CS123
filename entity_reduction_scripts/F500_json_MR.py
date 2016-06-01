@@ -111,10 +111,10 @@ class fortune_json_builder(MRJob):
             pass    
 
         organization, parent, recipient, employer = self.fields(line)
-        sys.stderr.write(organization)
-        sys.stderr.write("\n")
-        sys.stderr.write(employer)
-        sys.stderr.write("\n")
+        # sys.stderr.write(organization)
+        # sys.stderr.write("\n")
+        # sys.stderr.write(employer)
+        # sys.stderr.write("\n")
         names = [organization, employer]
         if organization != None:
             for c in self.companies: 
