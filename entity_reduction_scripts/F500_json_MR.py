@@ -25,6 +25,8 @@ K = 50
 DONOR_TYPE = 12
 ORGANIZATION = 21
 PARENT_ORGANIZATION = 23
+import sys
+
 
 class fortune_json_builder(MRJob):
     '''
@@ -39,6 +41,7 @@ class fortune_json_builder(MRJob):
         '''
         try:
             # Reads line & eliminates weird characters, skips header
+            line.encode('ascii', 'ignore')
             rdr = csv.reader([line])
             columns = rdr.next()
             for i in range(len(columns)):
@@ -103,18 +106,21 @@ class fortune_json_builder(MRJob):
         companies within the companies dictionary using a similarity metric.
         '''
         try: 
-            line.decode('ascii')
+            line.encode('ascii',ignore)
         except: 
             pass    
+
         organization, parent, recipient, employer = self.fields(line)
-        names = [organization, parent, recipient, employer]
+        sys.stderr.write(organization)
+        sys.stderr.write("\n")
+        sys.stderr.write(employer)
+        sys.stderr.write("\n")
+        names = [organization, employer]
         if organization != None:
             for c in self.companies: 
                 for n in names:
                     f500_score = self.similarity_score(c, n)
                     if f500_score > SIMILARITY_THRESHOLD:
-                        c = filter(lambda x: x in string.letters, c) 
-                        n = filter(lambda x: x in string.letters, c)
                         yield c, n
                 
     def reducer_init(self):
