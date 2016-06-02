@@ -44,6 +44,18 @@ class build_corporate_donations(MRJob):
         super(build_corporate_donations, self).configure_options()
         self.add_file_option('--ancillary')
     
+    def byteify(self, data):
+        '''
+        Converts input to bytes from unicode. 
+        
+        Many thanks to Mirec Miskuf, who provided this code on Stack Overflow.
+        http://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-of-unicode-ones-from-json-in-python
+        '''
+        if isinstance(data, unicode):
+            return data.encode('utf-8')
+        if isinstance(data, dict):
+            return {self.byteify(key): self.byteify(value) for key, value in data.iteritems()}
+    
     def similarity_score(self, string1, string2):
         '''
         Performs an analysis to determine the similarity of two strings.
@@ -82,7 +94,7 @@ class build_corporate_donations(MRJob):
             if columns[0] != 'id':
                 donor_name = columns[CONTRIBUTOR_NAME].strip()
                 donor_name = donor_name.replace(',', '')
-                organization = columns[ORGANIZATION].strip()
+                organization = columns[CONTRIBUTOR_EMPLOYER].strip()
                 parent = columns[PARENT_ORGANIZATION].strip()
                 recipient = columns[RECIPIENT_NAME].strip()
                 recipient = recipient.replace('(D)', '')
@@ -105,13 +117,14 @@ class build_corporate_donations(MRJob):
                 seat = None
                 result = None
                 
-            if organization.lower() != parent.lower() and parent in \
-             self.entity_dictionary:
-                organization = self.entity_dictionary.get(parent)
-            elif organization in self.entity_dictionary: 
+            if organization in self.entity_dictionary: 
                 organization = self.entity_dictionary.get(organization)
             else: 
                 organization = None
+            if parent in self.entity_dictionary:
+                parent = self.entity_dictionary.get(parent)
+            else:
+                parent = None
             
         except Exception as e: 
             donor_name = None
@@ -123,29 +136,30 @@ class build_corporate_donations(MRJob):
             seat = None
             result = None
         
-        return (organization, recipient, party, date, amount, seat, result, donor_name)
+        return (organization, parent, recipient, party, date, amount, seat, result, donor_name)
     
     def mapper_init(self):
         '''
         Holds entity dictionary in memory for authoritative name lookup.
         '''
         with open(self.options.ancillary, 'rU') as f:
-            self.entity_dictionary = json.load(f)
+            self.entity_dictionary = json.load(f, object_hook = self.byteify)
     
     def mapper(self, _, line):
         '''
         Reads line and concats strings. 
         '''
-        organization, recipient, party, date, amount, seat, result, donor_name = self.fields(line)
+        organization, parent, recipient, party, date, amount, seat, result, donor_name = self.fields(line)
         
-        if organization != None and self.similarity_score(donor_name, organization) < 90:
+        if (organization != None or parent != None) and \
+        self.similarity_score(donor_name, organization) < 90:
             if date != '':
                 year = date.split('-')[0]
                 month = date.split('-')[1]
             else: 
                 year = 'NaN'
                 month = 'NaN'
-            rv = ','.join([donor_name, organization, recipient, party, seat, result, month, year, str(amount)])
+            rv = ','.join([donor_name, organization, parent, recipient, party, seat, result, month, year, str(amount)])
             yield None, rv
         
 if __name__ == '__main__':
