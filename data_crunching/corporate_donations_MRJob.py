@@ -68,11 +68,12 @@ class build_corporate_donations(MRJob):
         '''
         yield_value = False
         try:
+            line.encode('ascii', 'ignore')
             # Reads line & eliminates weird characters, skips header
             rdr = csv.reader([line])
             columns = rdr.next()
             for i in range(len(columns)):
-                columns[i] = columns[i].strip("'\"\/").upper()
+                columns[i] = columns[i].replace("'\"\/", "").upper()
             if columns[0] != 'id':
                 donor_name = columns[CONTRIBUTOR_NAME]
                 organization = columns[ORGANIZATION]
@@ -82,8 +83,12 @@ class build_corporate_donations(MRJob):
                 date = columns[DATE]
                 amount = columns[AMOUNT]
                 seat = columns[SEAT]
-                result = columns[RESULT].replace("\\", "")
+                result = columns[RESULT].replace("\\", "").upper()
                 result = result.replace("'", "")
+                result = result.replace("T", "")
+                result = result.replace('"', '')
+                result = result.strip()
+                
             else:
                 donor_name = None
                 organization = None
@@ -94,12 +99,14 @@ class build_corporate_donations(MRJob):
                 amount = None
                 seat = None
                 result = None
+                
             if organization.lower() != parent.lower() and parent in \
              self.entity_dictionary:
                 organization = self.entity_dictionary.get(parent)
             elif organization in self.entity_dictionary: 
                 organization = self.entity_dictionary.get(organization)
-            recipient = self.entity_dictionary.get(recipient, None)
+            else: 
+                organization = None
             
         except Exception as e: 
             print e
@@ -125,25 +132,31 @@ class build_corporate_donations(MRJob):
         '''
         Reads line and concats strings. 
         '''
-        try: 
-            line.decode('ascii')
-        except: 
-            pass  
-        
         organization, recipient, party, date, amount, seat, result, donor_name = self.fields(line)
         
         if organization != None and self.similarity_score(donor_name, organization) > 90:
-            year = date.split('-')[0]
-            month = date.split('-')[1]
-            print [organization, recipient, party, seat, result, month, year]
+            if date != '':
+                year = date.split('-')[0]
+                month = date.split('-')[1]
+            else: 
+                year = 'NaN'
+                month = 'NaN'
             key = ','.join([organization, recipient, party, seat, result, month, year])
-        
-            yield key, amount
+            yield key, str(amount)
         
     def reducer(self, key, amount):
         '''
         '''
-        total = sum(amount)
+        amounts = []
+        for x in amount: 
+            try: 
+                amount.encode('ascii')
+                amounts.append(x)
+                print x
+            except Exception as e: 
+                print e
+                continue
+        total = str(sum(amounts))
         rv = ','.join([key, total])
         yield None, rv
         
