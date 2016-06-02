@@ -114,7 +114,6 @@ class build_corporate_donations(MRJob):
                 organization = None
             
         except Exception as e: 
-            print e
             donor_name = None
             organization = None
             recipient = None
@@ -146,16 +145,8 @@ class build_corporate_donations(MRJob):
             else: 
                 year = 'NaN'
                 month = 'NaN'
-            key = ','.join([donor_name, organization, recipient, party, seat, result, month, year])
-            yield key, float(amount)
-        
-    def reducer(self, key, amount):
-        '''
-        '''
-        total = str(sum(amount))
-        rv = ','.join([key, total])
-        yield None, rv
-        
+            rv = ','.join([donor_name, organization, recipient, party, seat, result, month, year, str(amount)])
+            yield None, rv
         
 if __name__ == '__main__':
     build_corporate_donations.run()
