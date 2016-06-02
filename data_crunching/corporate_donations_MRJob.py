@@ -127,7 +127,6 @@ class build_corporate_donations(MRJob):
                 parent = None
             
         except Exception as e: 
-            print e
             donor_name = None
             organization = None
             recipient = None
@@ -152,16 +151,25 @@ class build_corporate_donations(MRJob):
         '''
         organization, parent, recipient, party, date, amount, seat, result, donor_name = self.fields(line)
         
-        if (organization != None or parent != None) and \
-        self.similarity_score(donor_name, organization) > 90:
-            if date != '':
-                year = date.split('-')[0]
-                month = date.split('-')[1]
-            else: 
-                year = 'NaN'
-                month = 'NaN'
-            key = ','.join([donor_name, parent, recipient, party, seat, result, month, year, str(amount)])
-            yield None, key
+        if organization != None or parent != None:
+            score = None
+            if organization != None and donor_name != None:
+                score = self.similarity_score(donor_name, organization)
+            if parent != None and donor_name != None: 
+                score = self.similarity_score(donor_name, parent)
+            if score and score > 90:
+                if date != '':
+                    year = date.split('-')[0]
+                    month = date.split('-')[1]
+                else: 
+                    year = 'NaN'
+                    month = 'NaN'
+                name = [donor_name, organization, parent, recipient, party, seat, result, month, year, str(amount)]
+                for i in range(len(name)):
+                    if name[i] == None: 
+                        name[i] = 'NaN'
+                rv = ','.join(name)
+                yield None, rv
         
         
 if __name__ == '__main__':
