@@ -6,6 +6,14 @@ import heapq
 
 
 K = 10
+def find_aliases(aliases, value):
+    rv = []
+    for key, val in aliases.items():
+        if val  == value:
+            rv.append(key)
+    return rv
+  
+
 
 def run(filename):
     '''create statistics  on the json alias file'''
@@ -32,9 +40,20 @@ def run(filename):
     print "The top 10 companies with the most aliases are: \n"
     h = list(h)
     h.sort(reverse=True)
-
     for i in h:
         print i[1], "had " , i[0], " aliases \n"
+    print "Here are some the aliases \n"
+    att = find_aliases(aliases,'AT&T')
+    coke = find_aliases(aliases,'Coca-Cola Enterprises, Inc.')
+    sachs = find_aliases(aliases,'The Goldman Sachs Group, Inc.')
+    print(att, "\n")
+    print(coke, "\n")
+    print(sachs, "\n")
+
+
+
+
+
 
 
 if __name__ == "__main__":
