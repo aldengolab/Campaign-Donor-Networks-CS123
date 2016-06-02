@@ -32,6 +32,7 @@ class build_corporate_donations(MRJob):
     '''
     This job builds a dataset for corporate donations.
     '''
+
     OUTPUT_PROTOCOL = RawValueProtocol
 
     def configure_options(self):
@@ -113,7 +114,6 @@ class build_corporate_donations(MRJob):
                 organization = None
             
         except Exception as e: 
-            print e
             donor_name = None
             organization = None
             recipient = None
@@ -138,16 +138,15 @@ class build_corporate_donations(MRJob):
         '''
         organization, recipient, party, date, amount, seat, result, donor_name = self.fields(line)
         
-        if organization != None and self.similarity_score(donor_name, organization) > 90:
+        if organization != None and self.similarity_score(donor_name, organization) < 90:
             if date != '':
                 year = date.split('-')[0]
                 month = date.split('-')[1]
             else: 
                 year = 'NaN'
                 month = 'NaN'
-            key = ','.join([donor_name, recipient, party, seat, result, month, year, str(amount)])
-            yield None, key
-        
+            rv = ','.join([donor_name, organization, recipient, party, seat, result, month, year, str(amount)])
+            yield None, rv
         
 if __name__ == '__main__':
     build_corporate_donations.run()
