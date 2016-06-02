@@ -4,22 +4,28 @@ import json
 import csv
 from jsonmerge import merge 
 import sys
-import pprint
-
-rv = {}
-rv['filler']  = 'Replace at end'
 
 
 def transform_file(filename):
-    rv = {}
-    rv['filler']  = 'Replace at end'
-    with open(filename, 'rU') as f:
-        rdr = csv.reader(f, delimiter = "\n")
-        for j in rdr:
-            rv = merge(rv,j)
-    print rv[0]
+    jsons = []
+    #found at:
+    num_lines = sum(1 for line in open(filename))
+    i = 0
+    f = open(filename, 'rU')
+    while i < num_lines:
+        line = f.next()
+        jsons.append(line)
+        i+=1
+    f.close()
     
+    first = jsons[0]
+    second = jsons[1]
+    for i in range(len(jsons) -1):
+        if i != 0:
+            rv = merge(jsons[i], jsons[i + 1])
+    print rv
 
+    
 
 
 if __name__ == "__main__":
