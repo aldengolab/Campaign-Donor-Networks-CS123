@@ -32,6 +32,7 @@ class build_corporate_donations(MRJob):
     '''
     This job builds a dataset for corporate donations.
     '''
+
     OUTPUT_PROTOCOL = RawValueProtocol
 
     def configure_options(self):
@@ -77,6 +78,7 @@ class build_corporate_donations(MRJob):
                 columns[i] = columns[i].replace("'", "").upper()
                 columns[i] = columns[i].replace("\\", "")
                 columns[i] = columns[i].replace('"', '')
+                columns[i] = columns[i].replace('/', '')
             if columns[0] != 'id':
                 donor_name = columns[CONTRIBUTOR_NAME].strip()
                 donor_name = donor_name.replace(',', '')
@@ -145,16 +147,12 @@ class build_corporate_donations(MRJob):
                 year = 'NaN'
                 month = 'NaN'
             key = ','.join([donor_name, organization, recipient, party, seat, result, month, year])
-            yield key, str(amount)
+            yield key, float(amount)
         
     def reducer(self, key, amount):
         '''
         '''
-        amounts = []
-        for x in amount: 
-            x = float(unicodedata.normalize('NFKD', x).encode('ascii', 'ignore'))
-            amounts.append(x)
-        total = str(sum(amounts))
+        total = str(sum(amount))
         rv = ','.join([key, total])
         yield None, rv
         
