@@ -6,12 +6,13 @@
 # information for each authoritative name and prints to csv format.
 
 from mrjob.job import MRJob
-from mrjob.protocol import ReprValueProtocol
+from mrjob.protocol import RawValueProtocol
 import csv
 from fuzzywuzzy import fuzz
 import json
 import re
 import os
+import unicodedata
 
 # Column indices for slicing
 ID = 0
@@ -31,7 +32,7 @@ class build_corporate_donations(MRJob):
     '''
     This job builds a dataset for corporate donations.
     '''
-    OUTPUT_PROTOCOL = ReprValueProtocol
+    OUTPUT_PROTOCOL = RawValueProtocol
 
     def configure_options(self):
         '''
@@ -73,22 +74,26 @@ class build_corporate_donations(MRJob):
             rdr = csv.reader([line])
             columns = rdr.next()
             for i in range(len(columns)):
-                columns[i] = columns[i].replace("'\"\/", "").upper()
+                columns[i] = columns[i].replace("'", "").upper()
+                columns[i] = columns[i].replace("\\", "")
+                columns[i] = columns[i].replace('"', '')
+
             if columns[0] != 'id':
-                donor_name = columns[CONTRIBUTOR_NAME]
-                organization = columns[ORGANIZATION]
-                parent = columns[PARENT_ORGANIZATION]
-                recipient = columns[RECIPIENT_NAME]
-                party = columns[CANDIDATE_PARTY]
-                date = columns[DATE]
-                amount = columns[AMOUNT]
-                seat = columns[SEAT]
-                result = columns[RESULT].replace("\\", "").upper()
-                result = result.replace("'", "")
-                result = result.replace("T", "")
-                result = result.replace('"', '')
-                result = result.strip()
-                
+                donor_name = columns[CONTRIBUTOR_NAME].strip()
+                organization = columns[ORGANIZATION].strip()
+                parent = columns[PARENT_ORGANIZATION].strip()
+                recipient = columns[RECIPIENT_NAME].strip()
+                if ',' in recipient: 
+                    names = recipient.split(',')
+                    recipient = ' '.join([names[1], names[0]]).strip()
+                recipient = recipient.replace('(D)', '')
+                recipient = recipient.replace('(R)', '')
+                recipient = recipient.strip()
+                party = columns[CANDIDATE_PARTY].strip()
+                date = columns[DATE].strip()
+                amount = columns[AMOUNT].strip()
+                seat = columns[SEAT].strip()
+                result = columns[RESULT].upper().replace("T", "").strip()                
             else:
                 donor_name = None
                 organization = None
@@ -149,13 +154,8 @@ class build_corporate_donations(MRJob):
         '''
         amounts = []
         for x in amount: 
-            try: 
-                amount.encode('ascii')
-                amounts.append(x)
-                print x
-            except Exception as e: 
-                print e
-                continue
+            x = float(unicodedata.normalize('NFKD', x).encode('ascii', 'ignore'))
+            amounts.append(x)
         total = str(sum(amounts))
         rv = ','.join([key, total])
         yield None, rv
