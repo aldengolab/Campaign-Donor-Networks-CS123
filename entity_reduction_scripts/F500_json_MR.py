@@ -44,25 +44,26 @@ class fortune_json_builder(MRJob):
             line.encode('ascii', 'ignore')
             rdr = csv.reader([line])
             columns = rdr.next()
+
             for i in range(len(columns)):
-                columns[i] = columns[i].strip("'\"\/").upper()
+                columns[i] = columns[i].replace("'", "").upper()
+                columns[i] = columns[i].replace("\\", "")
+                columns[i] = columns[i].replace('"', '')
+                columns[i] = columns[i].replace("/", "")
+                
             if columns[0] != 'id':
-                organization = columns[ORGANIZATION]
-                parent = columns[PARENT_ORGANIZATION]
+                organization = columns[ORGANIZATION].strip()
+                parent = columns[PARENT_ORGANIZATION].strip()
                 recipient = columns[RECIPIENT_NAME]
-                employer = columns[CONTRIBUTOR_EMPLOYER]
+                employer = columns[CONTRIBUTOR_EMPLOYER].strip()
             else:
                 organization = None
-                parent = None
-                recipient = None
                 employer = None
         except: 
             organization = None
-            parent = None
-            recipient = None
             employer = None
         
-        return organization, parent, recipient, employer
+        return organization, employer
     
     def similarity_score(self, string1, string2):
         '''
@@ -110,7 +111,7 @@ class fortune_json_builder(MRJob):
         except: 
             pass    
 
-        organization, parent, recipient, employer = self.fields(line)
+        organization, employer = self.fields(line)
         # sys.stderr.write(organization)
         # sys.stderr.write("\n")
         # sys.stderr.write(employer)
