@@ -1,16 +1,28 @@
 # Fixes JSON output from MR to a single JSON file
 
 import json
+import csv
+from jsonmerge import merge 
+import sys
+import pprint
 
-def transform_file(filename, output_filename):
-    '''
-    '''
-    f = open(filename, 'rU')
-    w = open(output_filename, 'w')
-    for i in range(20000000):
-        line = json.loads(f.next())
-        w.append()
-        
-    f.close()
-    w.close()
-        
+rv = {}
+rv['filler']  = 'Replace at end'
+
+
+def transform_file(filename):
+    rv = {}
+    rv['filler']  = 'Replace at end'
+    with open(filename, 'rU') as f:
+        rdr = csv.reader(f, delimiter = "\n")
+        for j in rdr:
+            rv = merge(rv,j)
+    print rv[0]
+    
+
+
+
+if __name__ == "__main__":
+    '''takes a json file containing multiple jsons as the input'''
+    assert '.json' in sys.argv[1]
+    transform_file(sys.argv[1])
