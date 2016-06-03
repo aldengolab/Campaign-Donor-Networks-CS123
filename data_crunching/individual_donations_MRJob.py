@@ -130,6 +130,7 @@ class build_corporate_donations(MRJob):
             
         except Exception as e: 
             donor_name = None
+            parent = None
             organization = None
             recipient = None
             party = None
@@ -171,7 +172,8 @@ class build_corporate_donations(MRJob):
                     if name[i] == None: 
                         name[i] = 'NaN'
                 rv = ','.join(name)
-                yield None, rv
+                if not (donor_name == 'BAILEY JEROME H' and str(amount) != '25000.00000.00.00'):
+                    yield None, rv
         
 if __name__ == '__main__':
     build_corporate_donations.run()
