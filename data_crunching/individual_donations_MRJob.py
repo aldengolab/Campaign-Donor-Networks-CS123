@@ -119,10 +119,12 @@ class build_corporate_donations(MRJob):
                 
             if organization in self.entity_dictionary: 
                 organization = self.entity_dictionary.get(organization)
+                organization = organization.replace(',', '')
             else: 
                 organization = None
             if parent in self.entity_dictionary:
                 parent = self.entity_dictionary.get(parent)
+                parent = parent.replace(',', '')
             else:
                 parent = None
             
