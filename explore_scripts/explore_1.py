@@ -1,5 +1,5 @@
 '''
-1. Sum donations by donor over time
+1. Sum donations by donor for each entity
 '''
 from mrjob.job import MRJob
 import heapq
@@ -11,7 +11,6 @@ AMOUNT = 8
 CONTRIBUTOR_NAME = 10
 SEAT = 36
 K = 50
-DONOR_TYPE = 12
 
 
 class total_donations(MRJob):
@@ -26,23 +25,20 @@ class total_donations(MRJob):
             if columns[0] != 'id':
                 amount = float(columns[AMOUNT])
                 donor = columns[CONTRIBUTOR_NAME].lower()
-                donor_type = columns[DONOR_TYPE]
             if columns[0] == 'id':
                 amount = None
                 donor = None
-                donor_type = None
         except Exception as e:
             amount = None
             donor = None
-            donor_type =  None
 
-        return donor, amount, donor_type
+        return donor, amount
 
     def mapper(self, _, line):
         '''Yields the Name on Each line  and the value 1'''
-        donor, amount, donor_type = self.fields(line)
+        donor, amount = self.fields(line)
         if donor and amount:
-            yield (donor_type,donor),amount
+            yield donor,amount
 
     def combiner(self, donor, amount):
         ''' Combines names '''
@@ -59,8 +55,7 @@ class total_donations(MRJob):
     def reducer(self, donor, amount):
         ''' replaces min val of the heap if the amount number is greater than the min value '''
         try:
-            if donor[0] == 'c':
-                donor = str(donor[1])
+                donor = str(donor)
                 amount = sum(amount)
                 replacement = (amount, donor)
                 if replacement > min(self.h):
