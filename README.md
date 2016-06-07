@@ -12,11 +12,11 @@ http://data.influenceexplorer.com/docs/contributions/
 You'll find three relevant folders with scripts in each for the following:
 
 1. `explore` 
-..+ `explore_1.py` - sums unique contributors' contributions
-..+ `explore_3.py` - pulls unique donor/recipient pairs from dataset
-..+ `sample_records.py` - randomly samples from the full dataset
++ `explore_1.py` - sums unique contributors' contributions
++ `explore_3.py` - pulls unique donor/recipient pairs from dataset
++ `sample_records.py` - randomly samples from the full dataset
 2. `entity_reduction_scripts`
-..+ `F500_json_MR.py` - bulids a JSON of {nameInstance: authoritativeName} for all Fortune 500 companies
++ `F500_json_MR.py` - bulids a JSON of {nameInstance: authoritativeName} for all Fortune 500 companies
 3. `data_crunching` contains three scripts: 
-..+ `corporate_donations_MRJob.py` - aggregates F500 corporate donations into a csv
-..+ `individual_donations_MRJob.py`- aggregates individual F500 employee donations into a csv
++ `corporate_donations_MRJob.py` - aggregates F500 corporate donations into a csv
++ `individual_donations_MRJob.py`- aggregates individual F500 employee donations into a csv
