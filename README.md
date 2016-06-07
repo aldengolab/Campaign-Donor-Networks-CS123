@@ -9,6 +9,13 @@ http://data.influenceexplorer.com/docs/contributions/
 
 ## What's Here
 
+There are a few files in this directory worth pointing out: 
+
++ `requirements.txt` is the requirements file for running; all code is in Pyhon 2.7
++ `aws1.json` is the JSON used for entity resolution in the large dataset
++ `ftest.csv` is the list of Fortune 500 companies
++ `count_json.py` provides summary statistics for the entity resolution JSON
+
 You'll find three relevant folders with scripts in each for the following:
 
 1. `explore` 
