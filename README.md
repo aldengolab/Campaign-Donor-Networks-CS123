@@ -10,6 +10,7 @@ http://data.influenceexplorer.com/docs/contributions/
 ## What's Here
 
 You'll find three relevant folders with scripts in each for the following:
+
 1. `explore` 
 ..* `explore_1.py` - sums unique contributors' contributions
 ..* `explore_3.py` - pulls unique donor/recipient pairs from dataset
