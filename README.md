@@ -2,7 +2,7 @@
 ### _Alden Golab, Paul Mack_
 Code for measuring US campaign donor networks. Class project for CS 123 at the University of Chicago, utilizing parallelization through MapReduce to enhance performance. 
 
-Data provided by the Center for Responsive Politics at OpenSecrets.org via Sunlight’s Influence Explorer tool, with 15.1 GB of data amounting to over 5.1 million contribution records from 1990-2012.
+Data provided by the Center for Responsive Politics at OpenSecrets.org via Sunlight’s Influence Explorer tool, with 15.1 GB of data amounting to about 5.1 million contribution records from 1990-2012.
 
 See Data Dictionary:
 http://data.influenceexplorer.com/docs/contributions/
