@@ -17,6 +17,6 @@ You'll find three relevant folders with scripts in each for the following:
   + `sample_records.py` - randomly samples from the full dataset
 2. `entity_reduction_scripts`
   + `F500_json_MR.py` - bulids a JSON of {nameInstance: authoritativeName} for all Fortune 500 companies
-3. `data_crunching` contains three scripts: 
+3. `data_crunching` 
   + `corporate_donations_MRJob.py` - aggregates F500 corporate donations into a csv
   + `individual_donations_MRJob.py`- aggregates individual F500 employee donations into a csv
