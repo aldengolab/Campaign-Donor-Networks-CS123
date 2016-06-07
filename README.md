@@ -11,6 +11,8 @@ http://data.influenceexplorer.com/docs/contributions/
 
 There are a few files in this directory worth pointing out: 
 
++ `Golab&Mack_FinalReport.pdf` is the final report of findings.
++ `Golab&Mack_Presentation.pdf` is our final presentation, which includes visuals instead of just dry text.
 + `requirements.txt` is the requirements file for running; all code is in Pyhon 2.7
 + `aws1.json` is the JSON used for entity resolution in the large dataset
 + `ftest.csv` is the list of Fortune 500 companies
